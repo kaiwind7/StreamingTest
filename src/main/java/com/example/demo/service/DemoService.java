@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -22,11 +23,31 @@ public class DemoService {
         BufferedReader in = new BufferedReader(
             new InputStreamReader(connection.getInputStream())
         );
+
+        String preText="{ \"ResponseBody\": [";
+        int i=0;
         String decodedString;
+
+        outputStream.write(preText.getBytes(StandardCharsets.UTF_8));
         while ((decodedString = in.readLine()) != null) {
-            log.info("{}", decodedString);
-            outputStream.write(decodedString.getBytes(StandardCharsets.UTF_8));
+            //log.info("{}", decodedString);
+            if(i==0) {
+                outputStream.write(decodedString.getBytes(StandardCharsets.UTF_8));
+                break;
+            }
+            i++;
         }
+        /*
+        "Status": "Complete",
+                "PendingUri": null,
+                "Errors": []
+        */
+
+        String sufText = "], \"Status\": \"Complete\"," +
+                "\"PendingUri\": null," +
+                "\"Errors\": []" +
+                "}";
+        outputStream.write(sufText.getBytes(StandardCharsets.UTF_8));
 
     }
 }
